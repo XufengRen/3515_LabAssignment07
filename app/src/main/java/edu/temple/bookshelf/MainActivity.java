@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         display_fragment = new BookDetialsFragment();
-        list_fragment = new BookLlistFragment();
+        list_fragment = BookLlistFragment.newInstance(myList);
 
         fragmentManager = getSupportFragmentManager();
 

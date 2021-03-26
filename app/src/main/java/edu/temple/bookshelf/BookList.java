@@ -1,8 +1,13 @@
 package edu.temple.bookshelf;
 
-import java.util.ArrayList;
+import android.os.Parcelable;
 
-public class BookList {
+import androidx.annotation.NonNull;
+
+import java.util.ArrayList;
+import java.util.stream.Stream;
+
+public class BookList extends ArrayList<Parcelable> {
 
     public ArrayList<Book> bookList;
 
@@ -27,4 +32,9 @@ public class BookList {
         return bookList.size();
     }
 
+    @NonNull
+    @Override
+    public Stream<Parcelable> stream() {
+        return null;
+    }
 }
