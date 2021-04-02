@@ -16,6 +16,8 @@ public class listAdapter extends BaseAdapter {
     Context context;
     BookList bookList;
     LayoutInflater layoutInflater;
+
+
     public listAdapter(Context context, BookList list){
         this.context = context;
         bookList = list;
@@ -37,11 +39,10 @@ public class listAdapter extends BaseAdapter {
         return position;
     }
 
-    @SuppressLint("ResourceType")
     @Override
     public View getView(int position, View view, ViewGroup parent) {
         if(view ==null){
-            view = layoutInflater.inflate(R.id.listItem, parent, false);
+            view = layoutInflater.from(context).inflate(R.layout.fragment_item, parent, false);
         }
         TextView title = (TextView)view.findViewById(R.id.list_title);
         TextView author = (TextView)view.findViewById(R.id.list_author);
@@ -49,6 +50,7 @@ public class listAdapter extends BaseAdapter {
         String list_author = bookList.getBook(position).getAuthor();
         title.setText(list_title);
         author.setText(list_author);
+
         return view;
     }
 }

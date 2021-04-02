@@ -29,7 +29,7 @@ public class BookListFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static BookListFragment newInstance(String param1, String param2) {
+    public static BookListFragment newInstance(BookList booklist) {
         BookListFragment fragment = new BookListFragment();
         Bundle args = new Bundle();
         args.putParcelable("Booklist", booklist);
@@ -60,8 +60,6 @@ public class BookListFragment extends Fragment {
             booklist = getArguments().getParcelable("Booklist");
         }
     }
-
-
     public interface BookSelectedInterface{
         void itemSelected(int i);
     }
@@ -74,7 +72,9 @@ public class BookListFragment extends Fragment {
         ListView list = view.findViewById(R.id.list_f01);
         listAdapter adapter = new listAdapter(view.getContext(), booklist);
         list.setAdapter(adapter);
-        //on item select
+        list.setOnItemClickListener((parent, view1, position, id) -> {
+            parentActivity.itemSelected(position);
+        });
         return inflater.inflate(R.layout.fragment_book_list, container, false);
     }
 }
