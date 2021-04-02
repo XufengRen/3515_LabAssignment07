@@ -1,6 +1,7 @@
 package edu.temple.bookshelf;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -8,33 +9,51 @@ import android.os.Bundle;
 
 public class MainActivity extends AppCompatActivity {
 
-    FragmentManager fragmentManager;
+    FragmentManager fragmentManager = getSupportFragmentManager();
     FragmentTransaction fragmentTransaction;
     BookDetialsFragment display_fragment;
-    BookLlistFragment list_fragment;
+    boolean boo;
+    Book bookSelected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //Create booklist object and add elements
-        BookList myList = new BookList();
-        for (int i = 1; i <= 10; i++){
-            String title = "book"+ String.valueOf(i);
-            String author = "writer" + String.valueOf(i);
-            myList.addBook(title, author);
+        if(savedInstanceState != null){
+            bookSelected = savedInstanceState.getParcelable("selectedBook");
+        }
+        boo = findViewById(R.id.container2) != null;
+
+        Fragment f01;
+        f01 = fragmentManager.findFragmentById(R.id.container);
+        if(f01 instanceof BookDetialsFragment){
+            fragmentManager.popBackStack();
+        }else if(!(f01 instanceof BookListFragment)){
+            fragmentManager.beginTransaction()
+                    .add(R.id.container, BookListFragment.newInstance(getList()))
+            .commit();
         }
 
-        display_fragment = new BookDetialsFragment();
-        list_fragment = new BookLlistFragment();
+        display_fragment = (bookSelected == null) ? new BookDetialsFragment():BookDetialsFragment.newInstance(bookSelected);
+        if(boo){
+            fragmentManager.beginTransaction().
+                    replace(R.id.container2, display_fragment)
+                    .commit();
+        }else if (bookSelected != null){
+            fragmentManager.beginTransaction()
+                    .replace(R.id.container, display_fragment)
+                    .addToBackStack(null)
+                    .commit();
+        }
+    }
 
-        fragmentManager = getSupportFragmentManager();
+    private BookList getList(){
+        BookList myList = new BookList();
+        myList.addBook("t1","a1");
+        myList.addBook("t2","a2");
+        myList.addBook("t3","a3");
 
-        fragmentTransaction = fragmentManager.beginTransaction();
-
-        fragmentTransaction.add(R.id.container, list_fragment);
-
-        fragmentTransaction.commit();
+        return myList;
     }
 }

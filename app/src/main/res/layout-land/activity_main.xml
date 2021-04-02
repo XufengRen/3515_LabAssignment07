@@ -3,28 +3,30 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
 
     <FrameLayout
-        android:id="@+id/frameLayout2"
-        android:layout_width="381dp"
-        android:layout_height="389dp"
+        android:id="@+id/container"
+        android:layout_width="325dp"
+        android:layout_height="411dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/frameLayout"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.066"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
 
     </FrameLayout>
 
     <FrameLayout
-        android:id="@+id/frameLayout"
-        android:layout_width="399dp"
-        android:layout_height="398dp"
+        android:id="@+id/container2"
+        android:layout_width="344dp"
+        android:layout_height="406dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/frameLayout2"
+        app:layout_constraintStart_toEndOf="@+id/container"
         app:layout_constraintTop_toTopOf="parent">
 
     </FrameLayout>
