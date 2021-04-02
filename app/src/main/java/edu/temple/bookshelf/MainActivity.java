@@ -8,10 +8,10 @@ import android.os.Bundle;
 
 public class MainActivity extends AppCompatActivity {
 
-    FragmentManager fragmentManager;
+    FragmentManager fragmentManager = getSupportFragmentManager();
     FragmentTransaction fragmentTransaction;
     BookDetialsFragment display_fragment;
-    BookLlistFragment list_fragment;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,21 +20,11 @@ public class MainActivity extends AppCompatActivity {
 
         //Create booklist object and add elements
         BookList myList = new BookList();
-        for (int i = 1; i <= 10; i++){
-            String title = "book"+ String.valueOf(i);
-            String author = "writer" + String.valueOf(i);
-            myList.addBook(title, author);
-        }
+        myList.addBook("t1","a1");
+        myList.addBook("t2","a2");
+        myList.addBook("t3","a3");
+        myList.addBook("t4","a4");
 
-        display_fragment = new BookDetialsFragment();
-        list_fragment = BookLlistFragment.newInstance(myList);
 
-        fragmentManager = getSupportFragmentManager();
-
-        fragmentTransaction = fragmentManager.beginTransaction();
-
-        fragmentTransaction.add(R.id.container, list_fragment);
-
-        fragmentTransaction.commit();
     }
 }

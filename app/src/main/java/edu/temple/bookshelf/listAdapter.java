@@ -1,5 +1,6 @@
 package edu.temple.bookshelf;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -9,13 +10,16 @@ import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 public class listAdapter extends BaseAdapter {
     Context context;
     BookList bookList;
-    
-    public listAdapter(Context context, int res, BookList list){
+    LayoutInflater layoutInflater;
+    public listAdapter(Context context, BookList list){
         this.context = context;
         bookList = list;
+        layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
     @Override
@@ -33,30 +37,18 @@ public class listAdapter extends BaseAdapter {
         return position;
     }
 
+    @SuppressLint("ResourceType")
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        LinearLayout view;
-        TextView title;
-        TextView author;
+    public View getView(int position, View view, ViewGroup parent) {
+        if(view ==null){
+            view = layoutInflater.inflate(R.id.listItem, parent, false);
+        }
+        TextView title = (TextView)view.findViewById(R.id.list_title);
+        TextView author = (TextView)view.findViewById(R.id.list_author);
         String list_title = bookList.getBook(position).getTitle();
         String list_author = bookList.getBook(position).getAuthor();
-
-        view = new LinearLayout(context);
-        view.setOrientation(LinearLayout.VERTICAL);
-
-        title = new TextView(context);
-        title.setTextSize(32);
-        title.setGravity(Gravity.CENTER);
         title.setText(list_title);
-
-        author = new TextView(context);
-        author.setTextSize(16);
-        author.setGravity(Gravity.CENTER);
         author.setText(list_author);
-
-        view.addView(title);
-        view.addView(author);
-
         return view;
     }
 }
