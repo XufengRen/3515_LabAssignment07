@@ -60,9 +60,7 @@ public class BookListFragment extends Fragment {
             booklist = getArguments().getParcelable("Booklist");
         }
     }
-    public interface BookSelectedInterface{
-        void itemSelected(int i);
-    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -76,5 +74,9 @@ public class BookListFragment extends Fragment {
             parentActivity.itemSelected(position);
         });
         return inflater.inflate(R.layout.fragment_book_list, container, false);
+    }
+
+    public interface BookSelectedInterface{
+        void itemSelected(int i);
     }
 }
