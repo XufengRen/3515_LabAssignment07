@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 
 import android.os.Parcelable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,16 +21,17 @@ import java.util.ArrayList;
  */
 public class BookListFragment extends Fragment {
 
-    private static BookList booklist;
+    private BookList booklist;
     private Book book;
     Context context;
-    BookSelectedInterface parentActivity;
+    BookSelectedInterface bookSelectedInterface;
 
     public BookListFragment() {
         // Required empty public constructor
     }
 
     public static BookListFragment newInstance(BookList booklist) {
+        Log.i("--------------------------------------BookListFragment newInstance()","new book list fragment initiated");
         BookListFragment fragment = new BookListFragment();
         Bundle args = new Bundle();
         args.putParcelable("Booklist", booklist);
@@ -39,22 +41,20 @@ public class BookListFragment extends Fragment {
 
     @Override
     public void onAttach(Context context) {
-
+        Log.i("--------------------------------------BookListFragment onAttach()","");
         super.onAttach(context);
         if(context instanceof BookSelectedInterface){
-            parentActivity = (BookSelectedInterface) context;
-        }else{
-            throw new RuntimeException("Exception");
+            bookSelectedInterface = (BookSelectedInterface) context;
+        }
+        else{
+            throw new RuntimeException("implement interface in main activity");
         }
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        parentActivity = null;
-    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.i("--------------------------------------BookListFragment onCreate()","");
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             booklist = getArguments().getParcelable("Booklist");
@@ -65,15 +65,24 @@ public class BookListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.i("--------------------------------------BookListFragment onCreateView()","");
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_book_list, container, false);
         ListView list = view.findViewById(R.id.list_f01);
         listAdapter adapter = new listAdapter(view.getContext(), booklist);
         list.setAdapter(adapter);
         list.setOnItemClickListener((parent, view1, position, id) -> {
-            parentActivity.itemSelected(position);
+            Log.i("--------------------------------------BookListFragment onCreateView()","Enter on item click listener");
+            bookSelectedInterface.itemSelected(position);
         });
-        return inflater.inflate(R.layout.fragment_book_list, container, false);
+        return view;
+    }
+
+    @Override
+    public void onDetach() {
+        Log.i("--------------------------------------BookListFragment onDetach()","");
+        super.onDetach();
+        bookSelectedInterface = null;
     }
 
     public interface BookSelectedInterface{
