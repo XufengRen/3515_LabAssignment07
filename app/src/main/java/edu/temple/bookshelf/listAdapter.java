@@ -1,16 +1,12 @@
 package edu.temple.bookshelf;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.view.Gravity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 public class listAdapter extends BaseAdapter {
     Context context;
@@ -19,6 +15,7 @@ public class listAdapter extends BaseAdapter {
 
 
     public listAdapter(Context context, BookList list){
+        Log.i("------------------------------------list adapter initiated", "");
         this.context = context;
         bookList = list;
         layoutInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -41,8 +38,10 @@ public class listAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View view, ViewGroup parent) {
+        Log.i("------------------------------------list adapter getView()", "");
         if(view ==null){
-            view = layoutInflater.from(context).inflate(R.layout.fragment_item, parent, false);
+            Log.i("------------------------------------list adapter getView()", "inflate list item view if view is null");
+            view = layoutInflater.from(context).inflate(R.layout.list_item, parent, false);
         }
         TextView title = (TextView)view.findViewById(R.id.list_title);
         TextView author = (TextView)view.findViewById(R.id.list_author);
