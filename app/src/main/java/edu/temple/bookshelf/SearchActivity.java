@@ -38,8 +38,9 @@ public class SearchActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(JSONArray response){
                     Intent resultIntent = new Intent();
-
-                    resultIntent.putExtra(BOOKLIST_KEY, jsonToBookList(response));
+                    BookList return_this_to_main_activity = jsonToBookList(response);
+                    Log.i("-----------------------------------------------Search Activity, onCreate(), onResponse()","url: "+return_this_to_main_activity.getBook(0).getURL());
+                    resultIntent.putExtra(BOOKLIST_KEY, return_this_to_main_activity);
                     setResult(RESULT_OK, resultIntent);
                     finish();
                 }
@@ -61,12 +62,16 @@ public class SearchActivity extends AppCompatActivity {
         for(int i = 0; i<jsonArray.length(); i++){
             try{
                 tempBook = jsonArray.getJSONObject(i);
-                bookList.addBook(new Book(tempBook.getInt(id), tempBook.getString(title), tempBook.getString(author), tempBook.getString(cover_url)));
-
+                Book temp = new Book(tempBook.getInt(id), tempBook.getString(title), tempBook.getString(author), tempBook.getString(cover_url));
+                Log.i("-----------------------------------------------Search Activity, json to book list","new book object with url: "+temp.getURL());
+                bookList.addBook(temp);
+                Log.i("-----------------------------------------------Search Activity, json to book list","book info from json:"+" id: "+tempBook.getInt(id)+"; title: "+tempBook.getString(title)+"; author: "+ tempBook.getString(author)+ "; url: "+tempBook.getString(cover_url));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
+        Log.i("-----------------------------------------------Search Activity, json to book list","list length:"+bookList.bookListSize());
+        Log.i("-----------------------------------------------Search Activity, json to book list","url: "+bookList.getBook(0).getURL());
         return bookList;
     }
 }

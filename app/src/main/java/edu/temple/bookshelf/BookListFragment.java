@@ -27,6 +27,7 @@ public class BookListFragment extends Fragment {
     Context context;
     BookSelectedInterface bookSelectedInterface;
     ListView list;
+
     public BookListFragment() {
         // Required empty public constructor
     }
@@ -91,6 +92,11 @@ public class BookListFragment extends Fragment {
     }
 
     public void showResult(){
+        boolean nullcheck;
+        if(list==null){
+            nullcheck=true;
+        }else{nullcheck=false;}
+        Log.i("--------------------------------------BookListFragment, showResult()","is list null?: "+nullcheck);
         ((BaseAdapter) list.getAdapter()).notifyDataSetChanged();
     }
 }

@@ -107,10 +107,13 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     }
 
     private void showResult(){
+        boolean nullcheck;
+        if((BookListFragment) fragmentManager.findFragmentByTag("booklist")==null){nullcheck = true;}else{nullcheck = false;}
+        Log.i("------------------------in main showResult()","is booklist fragment null?: "+nullcheck);
         if(fragmentManager.findFragmentByTag("bookDetails") instanceof BookDetialsFragment){
             fragmentManager.popBackStack();
         }
-        ((BookListFragment) fragmentManager.findFragmentByTag("bookList")).showResult();
+        ((BookListFragment) fragmentManager.findFragmentByTag("booklist")).showResult();
     }
 
 
@@ -125,13 +128,18 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data){
         super.onActivityResult(requestCode, resultCode,data);
-
+        Log.i("------------------------in main onActivityResult()"," ");
         if(requestCode == REQUEST_CODE && resultCode == RESULT_OK){
             bookList.clear();
+            BookList add_this_to_booklist = (BookList) data.getParcelableExtra(SearchActivity.BOOKLIST_KEY);
+            Log.i("------------------------in main onActivityResult()","add this to book list: "+"id: "+add_this_to_booklist.getBook(0).getID()+"; title: "+add_this_to_booklist.getBook(0).getTitle()+"; author: "+add_this_to_booklist.getBook(0).getAuthor()+ "; cover url: "+add_this_to_booklist.getBook(0).getURL());
             bookList.addList((BookList) data.getParcelableExtra(SearchActivity.BOOKLIST_KEY));
+            Log.i("------------------------in main onActivityResult()","booklist size: "+bookList.bookListSize());
             if(bookList.bookListSize()==0){
                 Toast.makeText(this,"no match found", Toast.LENGTH_SHORT).show();
             }
+            Log.i("------------------------in main onActivityResult()","show book info: "+"id: "+bookList.getBook(0).getID()+"; title: "+bookList.getBook(0).getTitle()+"; author: "+bookList.getBook(0).getAuthor()+ "; cover url: "+bookList.getBook(0).getURL());
+            Log.i("------------------------in main onActivityResult()","go to showResult()");
             showResult();
         }
     }
