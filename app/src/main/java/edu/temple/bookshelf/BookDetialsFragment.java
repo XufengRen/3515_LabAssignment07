@@ -15,6 +15,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -66,19 +68,20 @@ public class BookDetialsFragment extends Fragment {
             title.setText(book.getTitle());
             author.setText(book.getAuthor());
             Log.i("---------------------------------------------------BookDetailsFragment onCreateView()","showing image with address:"+ book.getURL());
-            URL url = null;
-            try {
-                url = new URL(book.getURL());
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-            Bitmap bmp = null;
-            try {
-                bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-            } catch (NetworkOnMainThreadException | IOException e) {
-                e.printStackTrace();
-            }
-            image.setImageBitmap(bmp);
+//            URL url = null;
+//            try {
+//                url = new URL(book.getURL());
+//            } catch (MalformedURLException e) {
+//                e.printStackTrace();
+//            }
+//            Bitmap bmp = null;
+//            try {
+//                bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+//            } catch (NetworkOnMainThreadException | IOException e) {
+//                e.printStackTrace();
+//            }
+//            image.setImageBitmap(bmp);
+            Picasso.get().load(book.getURL()).into(image);
         }
 
         return view;
