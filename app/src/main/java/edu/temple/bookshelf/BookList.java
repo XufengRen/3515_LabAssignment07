@@ -32,11 +32,15 @@ public class BookList implements Parcelable {
         }
     };
 
-    public void addBook(String title, String author){
-        Book book = new Book(title, author);
+    public void addBook(Book book){
         bookList.add(book);
     }
 
+    public void addList(BookList list){
+        for (int i=0; i<list.bookListSize(); i++){
+            this.bookList.add(list.getBook(i));
+        }
+    }
     public void removeBook(Book book){
         bookList.remove(book);
     }
@@ -48,6 +52,8 @@ public class BookList implements Parcelable {
     public int bookListSize(){
         return bookList.size();
     }
+
+    public void clear(){bookList.clear();}
 
     @Override
     public int describeContents() {

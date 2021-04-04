@@ -16,6 +16,7 @@ public class BookDetialsFragment extends Fragment {
     TextView title, author;
     private Book book;
 
+
     public BookDetialsFragment() {
         // Required empty public constructor
     }
