@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class BookListFragment extends Fragment {
     private Book book;
     Context context;
     BookSelectedInterface bookSelectedInterface;
+    ListView list;
 
     public BookListFragment() {
         // Required empty public constructor
@@ -68,7 +70,7 @@ public class BookListFragment extends Fragment {
         Log.i("--------------------------------------BookListFragment onCreateView()","");
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_book_list, container, false);
-        ListView list = view.findViewById(R.id.list_f01);
+        list = view.findViewById(R.id.list_f01);
         listAdapter adapter = new listAdapter(view.getContext(), booklist);
         list.setAdapter(adapter);
         list.setOnItemClickListener((parent, view1, position, id) -> {
@@ -87,5 +89,14 @@ public class BookListFragment extends Fragment {
 
     public interface BookSelectedInterface{
         void itemSelected(int i);
+    }
+
+    public void showResult(){
+        boolean nullcheck;
+        if(list==null){
+            nullcheck=true;
+        }else{nullcheck=false;}
+        Log.i("--------------------------------------BookListFragment, showResult()","is list null?: "+nullcheck);
+        ((BaseAdapter) list.getAdapter()).notifyDataSetChanged();
     }
 }
