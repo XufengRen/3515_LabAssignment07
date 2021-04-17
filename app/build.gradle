@@ -38,6 +38,7 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation project(path: ':volley')
     implementation 'com.squareup.picasso:picasso:2.8'
+    implementation project(path: ':audiobookplayer')
     compile project(":volley")
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

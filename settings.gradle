@@ -1,3 +1,4 @@
+include ':audiobookplayer'
 include ':volley'
 include ':app'
 rootProject.name = "BookShelf"
