@@ -1,5 +1,6 @@
 package edu.temple.bookshelf;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -10,8 +11,14 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 import edu.temple.audiobookplayer.AudiobookService;
 
@@ -26,6 +33,13 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     private final int REQUEST_CODE = 9527;
     AudiobookService.MediaControlBinder mediaControlBinder;
     boolean connect;
+    private static final String PROGRESS ="progress";
+    public static final String DURATION = "duration";
+    int duration, progress;
+    SeekBar bar;
+    Button pause,play,stop;
+    TextView nowplaying;
+    playerFragment playerFragment;
 
     ServiceConnection serviceConnection = new ServiceConnection(){
 
@@ -42,11 +56,20 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         }
     };
 
+    Handler mediaHandler = new Handler(new Handler.Callback(){
+
+        @Override
+        public boolean handleMessage(@NonNull Message msg) {
+            return false;
+        }
+    });
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.i("-------------------------------------main onCreate()","Start onCreate of main activity");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        bar = findViewById(R.id.seekBar);
 
         findViewById(R.id.main_searchbutton).setOnClickListener((view) ->{
             startActivityForResult(new Intent(MainActivity.this, SearchActivity.class), 9527);
@@ -57,11 +80,13 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         if(savedInstanceState != null){
             selected = savedInstanceState.getParcelable("selectedBook");
             bookList = savedInstanceState.getParcelable("booklist");
+            duration = savedInstanceState.getInt(DURATION);
+            progress = savedInstanceState.getInt(PROGRESS);
         }else{
             bookList = new BookList();
         }
 
-        //check if screen id landscape
+        //check if screen is landscape
         if(findViewById(R.id.container2) != null){
             landscapeTracker = true;
         }else{
@@ -77,11 +102,12 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         }else if(!(f01 instanceof BookListFragment)){
             fragmentManager.beginTransaction()
                     .add(R.id.container, BookListFragment.newInstance(bookList), "booklist")
-            .commit();
+                    .commit();
         }
 
         //create display fragment if there isn't any
         display_fragment = (selected == null) ? new BookDetialsFragment():BookDetialsFragment.newInstance(selected);
+        playerFragment = (selected == null) ? new playerFragment():playerFragment.newInstance(selected);
 
         // if screen is landscape: show detail in container 2
         //if screen is portrait, replace list with detail in container1
@@ -95,6 +121,7 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
                     .addToBackStack(null)
                     .commit();
         }
+        bindService(new Intent(this, AudiobookService.class), serviceConnection, BIND_AUTO_CREATE);
     }
 
 //    private BookList bookList(){
@@ -143,6 +170,8 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         super.onSaveInstanceState(outState);
         outState.putParcelable("selectedBook", selected);
         outState.putParcelable("bookLlist", bookList);
+        outState.putInt(PROGRESS, progress);
+        outState.putInt(DURATION, duration);
     }
 
 
@@ -151,7 +180,10 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         super.onActivityResult(requestCode, resultCode,data);
         Log.i("------------------------in main onActivityResult()"," ");
         if(requestCode == REQUEST_CODE && resultCode == RESULT_OK){
-            bookList.clear();
+            if(bookList != null){
+                bookList.clear();
+
+            }
             BookList add_this_to_booklist = (BookList) data.getParcelableExtra(SearchActivity.BOOKLIST_KEY);
             Log.i("------------------------in main onActivityResult()","add this to book list: "+"id: "+add_this_to_booklist.getBook(0).getID()+"; title: "+add_this_to_booklist.getBook(0).getTitle()+"; author: "+add_this_to_booklist.getBook(0).getAuthor()+ "; cover url: "+add_this_to_booklist.getBook(0).getURL());
             bookList.addList((BookList) data.getParcelableExtra(SearchActivity.BOOKLIST_KEY));
@@ -169,4 +201,6 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         selected = null;
         super.onBackPressed();
     }
+
+
 }
