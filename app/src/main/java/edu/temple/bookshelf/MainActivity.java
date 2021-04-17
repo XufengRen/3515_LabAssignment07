@@ -91,10 +91,10 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         //if screen is portrait, replace list with detail in container1
         if(landscapeTracker){
             Log.i("----------------------------------------main OnCreate()","landscape mode");
-            if(intent.hasExtra("booklist")){
-                Bundle extras = getIntent().getExtras();
-                bookList = extras.getParcelable("booklist");
-            }
+//            if(intent.hasExtra("booklist")){
+//                Bundle extras = getIntent().getExtras();
+//                bookList = extras.getParcelable("booklist");
+//            }
             fragmentManager.beginTransaction()
                     .replace(R.id.container, BookListFragment.newInstance(bookList), "booklist")
                     .replace(R.id.container2, BookDetialsFragment.newInstance(selected),"bookDetails")
