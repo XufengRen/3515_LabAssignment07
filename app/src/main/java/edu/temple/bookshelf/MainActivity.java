@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     TextView nowplaying;
     playerFragment player_fragment;
     Intent intent;
+
     ServiceConnection serviceConnection = new ServiceConnection(){
 
         @Override
@@ -56,10 +57,38 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         }
     };
 
-    Handler mediaHandler = new Handler(new Handler.Callback(){
+    Handler playerHandler = new Handler(new Handler.Callback(){
 
         @Override
         public boolean handleMessage(@NonNull Message msg) {
+            AudiobookService.BookProgress bookProgress = (AudiobookService.BookProgress) msg.obj;
+
+            bar = findViewById(R.id.seekBar);
+            bar.setMax(duration);
+            if(mediaControlBinder.isPlaying()){
+                bar.setProgress(bookProgress.getProgress());
+                progress = selected.getDuration();
+            }
+
+            bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
+
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    if(fromUser){
+                        mediaControlBinder.seekTo(progress);
+                    }
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+            });
             return false;
         }
     });
@@ -217,6 +246,7 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
             startService(intent);
             duration = selected.getDuration();
             mediaControlBinder.play(i);
+            mediaControlBinder.setProgressHandler(playerHandler);
         }
     }
 
