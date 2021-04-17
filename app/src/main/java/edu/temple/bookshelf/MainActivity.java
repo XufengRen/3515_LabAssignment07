@@ -41,57 +41,6 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     TextView nowplaying;
     playerFragment player_fragment;
     Intent intent;
-
-    ServiceConnection serviceConnection = new ServiceConnection(){
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mediaControlBinder = (AudiobookService.MediaControlBinder) service;
-            connect=true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            connect=false;
-            mediaControlBinder = null;
-        }
-    };
-
-    Handler playerHandler = new Handler(new Handler.Callback(){
-
-        @Override
-        public boolean handleMessage(@NonNull Message msg) {
-            AudiobookService.BookProgress bookProgress = (AudiobookService.BookProgress) msg.obj;
-
-            bar = findViewById(R.id.seekBar);
-            bar.setMax(duration);
-            if(mediaControlBinder.isPlaying()){
-                bar.setProgress(bookProgress.getProgress());
-                progress = selected.getDuration();
-            }
-
-            bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
-
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    if(fromUser){
-                        mediaControlBinder.seekTo(progress);
-                    }
-                }
-
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-
-                }
-            });
-            return false;
-        }
-    });
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,11 +90,17 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         // if screen is landscape: show detail in container 2
         //if screen is portrait, replace list with detail in container1
         if(landscapeTracker){
+            Log.i("----------------------------------------main OnCreate()","landscape mode");
+            if(intent.hasExtra("booklist")){
+                Bundle extras = getIntent().getExtras();
+                bookList = extras.getParcelable("booklist");
+            }
             fragmentManager.beginTransaction()
                     .replace(R.id.container, BookListFragment.newInstance(bookList), "booklist")
-                    .replace(R.id.container2, display_fragment,"bookDetails")
+                    .replace(R.id.container2, BookDetialsFragment.newInstance(selected),"bookDetails")
                     .replace(R.id.container3, playerFragment.newInstance(selected), "player")
                     .commit();
+
         }else if (selected != null){
             fragmentManager.beginTransaction()
                     .replace(R.id.container, display_fragment,"bookDetails")
@@ -239,6 +194,56 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         super.onBackPressed();
     }
 
+    ServiceConnection serviceConnection = new ServiceConnection(){
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mediaControlBinder = (AudiobookService.MediaControlBinder) service;
+            connect=true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            connect=false;
+            mediaControlBinder = null;
+        }
+    };
+
+    Handler playerHandler = new Handler(new Handler.Callback(){
+
+        @Override
+        public boolean handleMessage(@NonNull Message msg) {
+            AudiobookService.BookProgress bookProgress = (AudiobookService.BookProgress) msg.obj;
+
+            bar = findViewById(R.id.seekBar);
+            bar.setMax(duration);
+            if(mediaControlBinder.isPlaying()){
+                bar.setProgress(bookProgress.getProgress());
+                progress = selected.getDuration();
+            }
+
+            bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
+
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    if(fromUser){
+                        mediaControlBinder.seekTo(progress);
+                    }
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+
+                }
+            });
+            return false;
+        }
+    });
 
     @Override
     public void play(int i) {

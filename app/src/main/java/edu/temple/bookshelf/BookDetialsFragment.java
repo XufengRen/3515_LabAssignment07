@@ -47,7 +47,9 @@ public class BookDetialsFragment extends Fragment {
         Log.i("---------------------------------------------------BookDetailsFragment onCreate()","in onCreate() now");
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
+            Log.i("---------------------------------------------------BookDetailsFragment onCreate()","argument is not null");
             book = getArguments().getParcelable("Book");
+            Log.i("---------------------------------------------------BookDetailsFragment onCreate()","got argument");
         }
     }
 
