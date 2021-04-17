@@ -6,8 +6,11 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 import edu.temple.audiobookplayer.AudiobookService;
@@ -21,6 +24,23 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     Book selected;
     BookList bookList;
     private final int REQUEST_CODE = 9527;
+    AudiobookService.MediaControlBinder mediaControlBinder;
+    boolean connect;
+
+    ServiceConnection serviceConnection = new ServiceConnection(){
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mediaControlBinder = (AudiobookService.MediaControlBinder) service;
+            connect=true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            connect=false;
+            mediaControlBinder = null;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

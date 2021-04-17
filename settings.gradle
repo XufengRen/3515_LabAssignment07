@@ -1,4 +1,6 @@
-include ':audiobookplayer'
+include ':audiobook-player'
+include ':gradle-wrapper'
+include ':audiobook'
 include ':volley'
 include ':app'
 rootProject.name = "BookShelf"
