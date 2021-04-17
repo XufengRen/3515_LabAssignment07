@@ -21,7 +21,7 @@ public class SearchActivity extends AppCompatActivity {
     private final String urlPrefic = "https://kamorris.com/lab/cis3515/search.php?term=";
     public static final String BOOKLIST_KEY = "booklist";
 
-    private final String id = "id",title = "title", author = "author", cover_url = "cover_url";
+    private final String id = "id",title = "title", author = "author", cover_url = "cover_url", duration = "duration";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,11 +58,12 @@ public class SearchActivity extends AppCompatActivity {
     private BookList jsonToBookList(JSONArray jsonArray){
         BookList bookList = new BookList();
         JSONObject tempBook;
-
+        Log.i("-----------------------------------------------Search Activity, jsontoBookList","jsonArray length: "+jsonArray.length());
         for(int i = 0; i<jsonArray.length(); i++){
             try{
                 tempBook = jsonArray.getJSONObject(i);
-                Book temp = new Book(tempBook.getInt(id), tempBook.getString(title), tempBook.getString(author), tempBook.getString(cover_url));
+                Log.i("-----------------------------------------------Search Activity, json obj",": "+tempBook);
+                Book temp = new Book(tempBook.getInt(id), tempBook.getString(title), tempBook.getString(author), tempBook.getString(cover_url), tempBook.getInt(duration));
                 Log.i("-----------------------------------------------Search Activity, json to book list","new book object with url: "+temp.getURL());
                 bookList.addBook(temp);
                 Log.i("-----------------------------------------------Search Activity, json to book list","book info from json:"+" id: "+tempBook.getInt(id)+"; title: "+tempBook.getString(title)+"; author: "+ tempBook.getString(author)+ "; url: "+tempBook.getString(cover_url));

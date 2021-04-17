@@ -22,7 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import edu.temple.audiobookplayer.AudiobookService;
 
-public class MainActivity extends AppCompatActivity implements BookListFragment.BookSelectedInterface {
+public class MainActivity extends AppCompatActivity implements BookListFragment.BookSelectedInterface,playerFragment.playerFragmentInterface {
 
     FragmentManager fragmentManager = getSupportFragmentManager();
     FragmentTransaction fragmentTransaction;
@@ -39,8 +39,8 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     SeekBar bar;
     Button pause,play,stop;
     TextView nowplaying;
-    playerFragment playerFragment;
-
+    playerFragment player_fragment;
+    Intent intent;
     ServiceConnection serviceConnection = new ServiceConnection(){
 
         @Override
@@ -107,13 +107,15 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
 
         //create display fragment if there isn't any
         display_fragment = (selected == null) ? new BookDetialsFragment():BookDetialsFragment.newInstance(selected);
-        playerFragment = (selected == null) ? new playerFragment():playerFragment.newInstance(selected);
-
+        player_fragment = (selected == null) ? new playerFragment():playerFragment.newInstance(selected);
+        intent = getIntent();
         // if screen is landscape: show detail in container 2
         //if screen is portrait, replace list with detail in container1
         if(landscapeTracker){
-            fragmentManager.beginTransaction().
-                    replace(R.id.container2, display_fragment,"bookDetails")
+            fragmentManager.beginTransaction()
+                    .replace(R.id.container, BookListFragment.newInstance(bookList), "booklist")
+                    .replace(R.id.container2, display_fragment,"bookDetails")
+                    .replace(R.id.container3, playerFragment.newInstance(selected), "player")
                     .commit();
         }else if (selected != null){
             fragmentManager.beginTransaction()
@@ -121,7 +123,8 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
                     .addToBackStack(null)
                     .commit();
         }
-        bindService(new Intent(this, AudiobookService.class), serviceConnection, BIND_AUTO_CREATE);
+        intent = new Intent(this, AudiobookService.class);
+        bindService(intent, serviceConnection, BIND_AUTO_CREATE);
     }
 
 //    private BookList bookList(){
@@ -145,10 +148,15 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         Log.i("------------------------in main bookSelected()","is there two frags on screen?: "+landscapeTracker);
         if(landscapeTracker){
             Log.i("-------------------------------------in main bookSelected()","in if(twoPane) now");
-            display_fragment.displayBook(selected);
+            //display_fragment.displayBook(selected);
+            fragmentManager.beginTransaction()
+            .replace(R.id.container2, BookDetialsFragment.newInstance(selected))
+            .replace(R.id.container3, playerFragment.newInstance(selected))
+            .commit();
         }else{
             fragmentManager.beginTransaction()
                     .replace(R.id.container, display_fragment.newInstance(selected), "bookDetails")
+                    .replace(R.id.container3, playerFragment.newInstance(selected))
                     .addToBackStack(null)
                     .commit();
         }
@@ -203,4 +211,22 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     }
 
 
+    @Override
+    public void play(int i) {
+        if(connect){
+            startService(intent);
+            duration = selected.getDuration();
+            mediaControlBinder.play(i);
+        }
+    }
+
+    @Override
+    public void pause(int i) {
+        mediaControlBinder.pause();
+    }
+
+    @Override
+    public void stop(int i) {
+        mediaControlBinder.stop();
+    }
 }
