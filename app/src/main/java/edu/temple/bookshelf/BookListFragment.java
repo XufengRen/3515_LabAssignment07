@@ -33,7 +33,7 @@ public class BookListFragment extends Fragment {
     }
 
     public static BookListFragment newInstance(BookList booklist) {
-        Log.i("--------------------------------------BookListFragment newInstance()","new book list fragment initiated");
+
         BookListFragment fragment = new BookListFragment();
         Bundle args = new Bundle();
         args.putParcelable("Booklist", booklist);

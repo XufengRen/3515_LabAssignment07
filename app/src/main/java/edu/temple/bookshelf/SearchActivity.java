@@ -39,7 +39,7 @@ public class SearchActivity extends AppCompatActivity {
                 public void onResponse(JSONArray response){
                     Intent resultIntent = new Intent();
                     BookList return_this_to_main_activity = jsonToBookList(response);
-                    Log.i("-----------------------------------------------Search Activity, onCreate(), onResponse()","url: "+return_this_to_main_activity.getBook(0).getURL());
+                    //Log.i("-----------------------------------------------Search Activity, onCreate(), onResponse()","url: "+return_this_to_main_activity.getBook(0).getURL());
                     resultIntent.putExtra(BOOKLIST_KEY, return_this_to_main_activity);
                     setResult(RESULT_OK, resultIntent);
                     finish();

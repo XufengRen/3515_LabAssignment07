@@ -34,7 +34,7 @@ public class BookDetialsFragment extends Fragment {
 
 
     public static BookDetialsFragment newInstance(Book book) {
-        Log.i("---------------------------------------------------BookDetailsFragment newInstance", " new bookdetailsfragment initiated with book: "+book.getTitle());
+        //Log.i("---------------------------------------------------BookDetailsFragment newInstance", " new bookdetailsfragment initiated with book: "+book.getTitle());
         BookDetialsFragment fragment = new BookDetialsFragment();
         Bundle args = new Bundle();
         args.putParcelable("Book", book);
