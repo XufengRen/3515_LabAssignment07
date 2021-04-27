@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         }else{
             File savedlist = new File(this.getFilesDir().getAbsolutePath()+"/save.json");
             if(savedlist.exists()){
+                System.out.println("getting list from json file");
                 bookList = BookList.fromJson(savedlist);
             }
             bookList = new BookList();
@@ -241,6 +242,9 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
             if(mediaControlBinder.isPlaying()){
                 bar.setProgress(bookProgress.getProgress());
                 progress = selected.getDuration();
+
+            }
+            if(msg.obj != null && playing != null){
                 timestamp=bookProgress.getProgress();
             }
 
@@ -272,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         if(connect){
             Log.i("-----------------------------------------main play():", "connected");
             //pause whatever is playing first
-            pause();
+            //pause();
             playing = selected;
             //if file exist, play from file
             File f = new File(getFilesDir(),"/"+playing.getID()+".mp3");
@@ -280,7 +284,8 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
                 Log.i("-----------------------------------------main play():", "local file detected");
                 //if saved progress >= 10 , start 10 second earlier, else start from beginning
                 int startPpoint;
-                int saved = sharedPrefs.getInt(PROGRESS+playing.getID(),0);
+                int saved = sharedPrefs.getInt(TIMESTAMP+playing.getID(),0);
+                System.out.println("timestamp in pref: "+saved);
                 if(saved>=10){
                     startPpoint = saved-10;
                 }else{startPpoint=0;}
@@ -324,6 +329,7 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     public void pause() {
         //pause book and save progress
         if(playing!=null){
+            System.out.println("timestamp:"+timestamp);
             SharedPreferences.Editor editor = sharedPrefs.edit();
             editor.putInt(PLAYINGBOOK, playing.getID());
             editor.putInt(TIMESTAMP+playing.getID(),timestamp);

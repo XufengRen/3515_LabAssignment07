@@ -86,6 +86,13 @@ public class BookList implements Parcelable {
         }
         return null;
     }
+    private static final BookList fromJson(JSONArray arr) throws JSONException {
+        BookList list = new BookList();
+        for(int i = 0; i < arr.length(); i++) {
+            list.addBook(Book.fromJson(arr.getJSONObject(i)));
+        }
+        return list;
+    }
     public void saveList(File file) {
         // create the JSON array
         JSONArray arr = new JSONArray();
