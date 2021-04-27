@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentTransaction;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -19,7 +20,21 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+
 import edu.temple.audiobookplayer.AudiobookService;
+
+import static java.lang.String.valueOf;
 
 public class MainActivity extends AppCompatActivity implements BookListFragment.BookSelectedInterface,playerFragment.playerFragmentInterface {
 
@@ -40,7 +55,8 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     TextView nowplaying;
     playerFragment player_fragment;
     Intent intent;
-    
+    private static SharedPreferences sharedPrefs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.i("-------------------------------------main onCreate()","Start onCreate of main activity");
@@ -110,19 +126,7 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         bindService(intent, serviceConnection, BIND_AUTO_CREATE);
     }
 
-//    private BookList bookList(){
-//        BookList myList = new BookList();
-//        myList.addBook("asdsaddsat1","a1");
-//        myList.addBook("safdfdsft2","a2");
-//        myList.addBook("fdbdgrhrdt3","a3");
-//        myList.addBook("tbdfbdvdf4","a4");
-//        myList.addBook("tbdfgrde5","a5");
-//        myList.addBook("tbfdbrge6","a6");
-//        myList.addBook("tvsdsfvsd7","a7");
-//        myList.addBook("tsdvfdsfds8","a8");
-//        myList.addBook("dsfsdfdst9","a9");
-//        return myList;
-//    }
+
 
     @Override
     public void itemSelected(int i){
@@ -176,13 +180,13 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
 
             }
             BookList add_this_to_booklist = (BookList) data.getParcelableExtra(SearchActivity.BOOKLIST_KEY);
-            Log.i("------------------------in main onActivityResult()","add this to book list: "+"id: "+add_this_to_booklist.getBook(0).getID()+"; title: "+add_this_to_booklist.getBook(0).getTitle()+"; author: "+add_this_to_booklist.getBook(0).getAuthor()+ "; cover url: "+add_this_to_booklist.getBook(0).getURL());
+            //Log.i("------------------------in main onActivityResult()","add this to book list: "+"id: "+add_this_to_booklist.getBook(0).getID()+"; title: "+add_this_to_booklist.getBook(0).getTitle()+"; author: "+add_this_to_booklist.getBook(0).getAuthor()+ "; cover url: "+add_this_to_booklist.getBook(0).getURL());
             bookList.addList((BookList) data.getParcelableExtra(SearchActivity.BOOKLIST_KEY));
             Log.i("------------------------in main onActivityResult()","booklist size: "+bookList.bookListSize());
             if(bookList.bookListSize()==0){
                 Toast.makeText(this,"no match found", Toast.LENGTH_SHORT).show();
             }
-            Log.i("------------------------in main onActivityResult()","show book info: "+"id: "+bookList.getBook(0).getID()+"; title: "+bookList.getBook(0).getTitle()+"; author: "+bookList.getBook(0).getAuthor()+ "; cover url: "+bookList.getBook(0).getURL());
+            //Log.i("------------------------in main onActivityResult()","show book info: "+"id: "+bookList.getBook(0).getID()+"; title: "+bookList.getBook(0).getTitle()+"; author: "+bookList.getBook(0).getAuthor()+ "; cover url: "+bookList.getBook(0).getURL());
             Log.i("------------------------in main onActivityResult()","go to showResult()");
             showResult();
         }
@@ -245,22 +249,69 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     });
 
     @Override
-    public void play(int i) {
+    public void play(Book book) {
         if(connect){
-            startService(intent);
-            duration = selected.getDuration();
-            mediaControlBinder.play(i);
-            mediaControlBinder.setProgressHandler(playerHandler);
+            Log.i("-----------------------------------------main play():", "connected");
+            //pause whatever is playing first
+            pause();
+
+            //if file exist, play from file
+            File f = new File(getFilesDir(),"/"+book.getID()+".mp3");
+            if(f.exists()){
+                Log.i("-----------------------------------------main play():", "local file detected");
+                //if saved progress >= 10 , start 10 second earlier, else start from beginning
+//                int startPpoint;
+//                int saved = sharedPrefs.getInt(PROGRESS+book.getID(),0);
+//                if(saved>=10){
+//                    startPpoint = saved-10;
+//                }else{startPpoint=0;}
+
+                mediaControlBinder.play(f);
+                startService(intent);
+                duration = selected.getDuration();
+                mediaControlBinder.setProgressHandler(playerHandler);
+            }else{
+                //else steam and download
+                Log.i("-----------------------------------------main play()", "start streaming");
+                startService(intent);
+                duration = selected.getDuration();
+                mediaControlBinder.play(book.getID());
+                //download the mp3 file
+                new Thread(() -> {
+                    try {
+                        URL url = new URL("https://kamorris.com/lab/audlib/download.php?id=" + book.getID());
+                        ReadableByteChannel readableByteChannel = Channels.newChannel(url.openStream());
+                        FileOutputStream fileOutputStream = new FileOutputStream(f);
+                        FileChannel fileChannel = fileOutputStream.getChannel();
+
+                        fileOutputStream.getChannel()
+                                .transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }).start();
+                mediaControlBinder.setProgressHandler(playerHandler);
+
+            }
         }
+
     }
 
     @Override
-    public void pause(int i) {
+    public void pause() {
         mediaControlBinder.pause();
     }
 
     @Override
-    public void stop(int i) {
+    public void stop() {
         mediaControlBinder.stop();
+        stopService(intent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(serviceConnection);
     }
 }

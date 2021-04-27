@@ -5,12 +5,20 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -64,7 +72,8 @@ public class playerFragment extends Fragment {
         play.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                playerInterface.play(book.getID());
+
+                playerInterface.play(book);
                 if(book != null){
                     nowPlaying.setText("Now Playing:"+book.getTitle());
                 }
@@ -73,13 +82,13 @@ public class playerFragment extends Fragment {
         pause.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                playerInterface.pause(book.getID());
+                playerInterface.pause();
             }
         });
         stop.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                playerInterface.stop(book.getID());
+                playerInterface.stop();
             }
         });
         return view;
@@ -94,9 +103,12 @@ public class playerFragment extends Fragment {
             throw new RuntimeException("Implement playerFragmentInterface");
         }
     }
+
+
+
     interface playerFragmentInterface{
-        void play(int i);
-        void pause(int i);
-        void stop(int i);
+        void play(Book book);
+        void pause();
+        void stop();
     }
 }

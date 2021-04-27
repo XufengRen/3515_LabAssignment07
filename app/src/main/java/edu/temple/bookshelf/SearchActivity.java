@@ -71,8 +71,10 @@ public class SearchActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        Log.i("-----------------------------------------------Search Activity, json to book list","list length:"+bookList.bookListSize());
-        Log.i("-----------------------------------------------Search Activity, json to book list","url: "+bookList.getBook(0).getURL());
+        if(bookList.bookListSize()>0){
+            Log.i("-----------------------------------------------Search Activity, json to book list","list length:"+bookList.bookListSize());
+        }
+
         return bookList;
     }
 }
