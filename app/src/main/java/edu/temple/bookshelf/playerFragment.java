@@ -72,9 +72,7 @@ public class playerFragment extends Fragment {
         play.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-
                 playerInterface.play();
-
             }
         });
         pause.setOnClickListener(new View.OnClickListener(){

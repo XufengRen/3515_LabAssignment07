@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     private static SharedPreferences sharedPrefs;
     private static int timestamp;
     private static Book playing;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.i("-------------------------------------main onCreate()","Start onCreate of main activity");
@@ -80,6 +81,10 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
             duration = savedInstanceState.getInt(DURATION);
             progress = savedInstanceState.getInt(PROGRESS);
         }else{
+            File savedlist = new File(this.getFilesDir().getAbsolutePath()+"/save.json");
+            if(savedlist.exists()){
+                bookList = BookList.fromJson(savedlist);
+            }
             bookList = new BookList();
         }
 
@@ -193,6 +198,8 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
             BookList add_this_to_booklist = (BookList) data.getParcelableExtra(SearchActivity.BOOKLIST_KEY);
             //Log.i("------------------------in main onActivityResult()","add this to book list: "+"id: "+add_this_to_booklist.getBook(0).getID()+"; title: "+add_this_to_booklist.getBook(0).getTitle()+"; author: "+add_this_to_booklist.getBook(0).getAuthor()+ "; cover url: "+add_this_to_booklist.getBook(0).getURL());
             bookList.addList((BookList) data.getParcelableExtra(SearchActivity.BOOKLIST_KEY));
+            File file = new File(this.getFilesDir().getAbsolutePath()+"/save.json");
+            bookList.saveList(file);
             Log.i("------------------------in main onActivityResult()","booklist size: "+bookList.bookListSize());
             if(bookList.bookListSize()==0){
                 Toast.makeText(this,"no match found", Toast.LENGTH_SHORT).show();
@@ -204,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     }
     @Override
     public void onBackPressed() {
-        selected = null;
+
         super.onBackPressed();
     }
 
@@ -318,7 +325,7 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         //pause book and save progress
         if(playing!=null){
             SharedPreferences.Editor editor = sharedPrefs.edit();
-            editor.putInt(PLAYINGBOOK, selected.getID());
+            editor.putInt(PLAYINGBOOK, playing.getID());
             editor.putInt(TIMESTAMP+playing.getID(),timestamp);
             editor.commit();
         }

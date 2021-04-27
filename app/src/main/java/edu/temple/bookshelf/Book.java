@@ -3,6 +3,9 @@ package edu.temple.bookshelf;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class Book implements Parcelable {
     String title;
     String author;
@@ -65,4 +68,24 @@ public class Book implements Parcelable {
     public String getURL(){return coverURL;}
 
     public int getDuration(){return duration;}
+
+    public JSONObject toJson() throws JSONException {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("id", this.getID());
+        jsonObject.put("title", this.getTitle());
+        jsonObject.put("author", this.getAuthor());
+        jsonObject.put("url", this.getURL());
+        jsonObject.put("duration", this.getDuration());
+        return jsonObject;
+    }
+
+    public static Book fromJson(JSONObject json) throws JSONException {
+        return new Book(
+                json.getInt("id"),
+                json.getString("title"),
+                json.getString("author"),
+                json.getString("url"),
+                json.getInt("duration")
+        );
+    }
 }
