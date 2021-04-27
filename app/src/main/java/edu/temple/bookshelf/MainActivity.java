@@ -49,6 +49,9 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     boolean connect;
     private static final String PROGRESS ="progress";
     public static final String DURATION = "duration";
+    public static final String PLAYINGBOOK = "playingBook";
+    public static final String BOOKLIST = "booklist";
+    public static final String TIMESTAMP = "timestamp";
     int duration, progress;
     SeekBar bar;
     Button pause,play,stop;
@@ -56,7 +59,8 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     playerFragment player_fragment;
     Intent intent;
     private static SharedPreferences sharedPrefs;
-
+    private static int timestamp;
+    private static Book playing;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.i("-------------------------------------main onCreate()","Start onCreate of main activity");
@@ -224,7 +228,7 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
                 bar.setProgress(bookProgress.getProgress());
                 progress = selected.getDuration();
             }
-
+            timestamp=((AudiobookService.BookProgress) msg.obj).getProgress();
             bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
 
                 @Override
@@ -254,19 +258,19 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
             Log.i("-----------------------------------------main play():", "connected");
             //pause whatever is playing first
             pause();
-
+            playing = book;
             //if file exist, play from file
             File f = new File(getFilesDir(),"/"+book.getID()+".mp3");
             if(f.exists()){
                 Log.i("-----------------------------------------main play():", "local file detected");
                 //if saved progress >= 10 , start 10 second earlier, else start from beginning
-//                int startPpoint;
-//                int saved = sharedPrefs.getInt(PROGRESS+book.getID(),0);
-//                if(saved>=10){
-//                    startPpoint = saved-10;
-//                }else{startPpoint=0;}
+                int startPpoint;
+                int saved = sharedPrefs.getInt(PROGRESS+book.getID(),0);
+                if(saved>=10){
+                    startPpoint = saved-10;
+                }else{startPpoint=0;}
 
-                mediaControlBinder.play(f);
+                mediaControlBinder.play(f, startPpoint);
                 startService(intent);
                 duration = selected.getDuration();
                 mediaControlBinder.setProgressHandler(playerHandler);
@@ -300,11 +304,27 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
 
     @Override
     public void pause() {
+        //pause book and save progress
+        if(playing!=null){
+            SharedPreferences.Editor editor = sharedPrefs.edit();
+            editor.putInt(PLAYINGBOOK, selected.getID());
+            editor.putInt(TIMESTAMP+playing.getID(),timestamp);
+            editor.commit();
+        }
+
         mediaControlBinder.pause();
     }
 
     @Override
     public void stop() {
+        //clear info in preference
+        if(playing!=null){
+            SharedPreferences.Editor editor = sharedPrefs.edit();
+            editor.remove(TIMESTAMP+playing.getID());
+            editor.putInt(PLAYINGBOOK, -1);
+            editor.commit();
+        }
+        playing=null;
         mediaControlBinder.stop();
         stopService(intent);
     }
