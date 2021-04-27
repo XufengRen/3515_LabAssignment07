@@ -90,7 +90,7 @@ public class BookDetialsFragment extends Fragment {
     }
 
     public void displayBook(Book book){
-        Log.i("---------------------------------------------------BookDetailsFragment displayBook()","displaying book");
+        //Log.i("---------------------------------------------------BookDetailsFragment displayBook()","displaying book");
         title.setText(book.getTitle());
         author.setText(book.getAuthor());
     }

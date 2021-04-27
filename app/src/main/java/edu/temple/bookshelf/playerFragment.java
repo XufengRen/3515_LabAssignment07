@@ -42,21 +42,21 @@ public class playerFragment extends Fragment {
     }
 
 
-    public static playerFragment newInstance(Book book) {
-        playerFragment fragment = new playerFragment();
-        Bundle args = new Bundle();
-        args.putParcelable(PLAYER,book);
-        fragment.setArguments(args);
-        return fragment;
-    }
+//    public static playerFragment newInstance(Book book) {
+//        playerFragment fragment = new playerFragment();
+//        Bundle args = new Bundle();
+//        args.putParcelable(PLAYER,book);
+//        fragment.setArguments(args);
+//        return fragment;
+//    }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            book = getArguments().getParcelable(PLAYER);
-        }
-    }
+//    @Override
+//    public void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        if (getArguments() != null) {
+//            book = getArguments().getParcelable(PLAYER);
+//        }
+//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -73,10 +73,8 @@ public class playerFragment extends Fragment {
             @Override
             public void onClick(View view){
 
-                playerInterface.play(book);
-                if(book != null){
-                    nowPlaying.setText("Now Playing:"+book.getTitle());
-                }
+                playerInterface.play();
+
             }
         });
         pause.setOnClickListener(new View.OnClickListener(){
@@ -107,7 +105,7 @@ public class playerFragment extends Fragment {
 
 
     interface playerFragmentInterface{
-        void play(Book book);
+        void play();
         void pause();
         void stop();
     }

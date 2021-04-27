@@ -104,7 +104,12 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
 
         //create display fragment if there isn't any
         display_fragment = (selected == null) ? new BookDetialsFragment():BookDetialsFragment.newInstance(selected);
-        player_fragment = (selected == null) ? new playerFragment():playerFragment.newInstance(selected);
+        if ((player_fragment = (playerFragment) fragmentManager.findFragmentById(R.id.container3)) == null) {
+            player_fragment = new playerFragment();
+            fragmentManager.beginTransaction()
+                    .add(R.id.container3, player_fragment)
+                    .commit();
+        }
 
         intent = getIntent();
         // if screen is landscape: show detail in container 2
@@ -116,9 +121,9 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
 //                bookList = extras.getParcelable("booklist");
 //            }
             fragmentManager.beginTransaction()
-                    .replace(R.id.container, BookListFragment.newInstance(bookList), "booklist")
+                    //.replace(R.id.container, BookListFragment.newInstance(bookList), "booklist")
                     .replace(R.id.container2, BookDetialsFragment.newInstance(selected),"bookDetails")
-                    .replace(R.id.container3, playerFragment.newInstance(selected), "player")
+                    //.replace(R.id.container3, playerFragment.newInstance(selected), "player")
                     .commit();
 
         }else if (selected != null){
@@ -141,14 +146,15 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         if(landscapeTracker){
             Log.i("-------------------------------------in main bookSelected()","in if(twoPane) now");
             //display_fragment.displayBook(selected);
-            fragmentManager.beginTransaction()
-            .replace(R.id.container2, BookDetialsFragment.newInstance(selected))
-            .replace(R.id.container3, playerFragment.newInstance(selected))
-            .commit();
+            display_fragment.displayBook(selected);
+//            fragmentManager.beginTransaction()
+//            .replace(R.id.container2, BookDetialsFragment.newInstance(selected))
+//            .replace(R.id.container3, playerFragment.newInstance(selected))
+//            .commit();
         }else{
             fragmentManager.beginTransaction()
                     .replace(R.id.container, display_fragment.newInstance(selected), "bookDetails")
-                    .replace(R.id.container3, playerFragment.newInstance(selected))
+                    //.replace(R.id.container3, playerFragment.newInstance(selected))
                     .addToBackStack(null)
                     .commit();
         }
@@ -255,19 +261,19 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
     });
 
     @Override
-    public void play(Book book) {
+    public void play() {
         if(connect){
             Log.i("-----------------------------------------main play():", "connected");
             //pause whatever is playing first
             pause();
-            playing = book;
+            playing = selected;
             //if file exist, play from file
-            File f = new File(getFilesDir(),"/"+book.getID()+".mp3");
+            File f = new File(getFilesDir(),"/"+playing.getID()+".mp3");
             if(f.exists()){
                 Log.i("-----------------------------------------main play():", "local file detected");
                 //if saved progress >= 10 , start 10 second earlier, else start from beginning
                 int startPpoint;
-                int saved = sharedPrefs.getInt(PROGRESS+book.getID(),0);
+                int saved = sharedPrefs.getInt(PROGRESS+playing.getID(),0);
                 if(saved>=10){
                     startPpoint = saved-10;
                 }else{startPpoint=0;}
@@ -281,11 +287,11 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
                 Log.i("-----------------------------------------main play()", "start streaming");
                 startService(intent);
                 duration = selected.getDuration();
-                mediaControlBinder.play(book.getID());
+                mediaControlBinder.play(playing.getID());
                 //download the mp3 file
                 new Thread(() -> {
                     try {
-                        URL url = new URL("https://kamorris.com/lab/audlib/download.php?id=" + book.getID());
+                        URL url = new URL("https://kamorris.com/lab/audlib/download.php?id=" + playing.getID());
                         ReadableByteChannel readableByteChannel = Channels.newChannel(url.openStream());
                         FileOutputStream fileOutputStream = new FileOutputStream(f);
                         FileChannel fileChannel = fileOutputStream.getChannel();
@@ -301,7 +307,10 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
 
             }
         }
-
+        if(playing != null){
+            TextView nowPlaying = findViewById(R.id.nowPlaying);
+            nowPlaying.setText("Now Playing:"+playing.getTitle());
+        }
     }
 
     @Override
