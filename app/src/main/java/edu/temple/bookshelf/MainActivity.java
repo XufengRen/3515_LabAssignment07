@@ -66,8 +66,8 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         Log.i("-------------------------------------main onCreate()","Start onCreate of main activity");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        sharedPrefs = getSharedPreferences(getPackageName(),MODE_PRIVATE);
         bar = findViewById(R.id.seekBar);
-
         findViewById(R.id.main_searchbutton).setOnClickListener((view) ->{
             startActivityForResult(new Intent(MainActivity.this, SearchActivity.class), 9527);
         });
@@ -105,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
         //create display fragment if there isn't any
         display_fragment = (selected == null) ? new BookDetialsFragment():BookDetialsFragment.newInstance(selected);
         player_fragment = (selected == null) ? new playerFragment():playerFragment.newInstance(selected);
+
         intent = getIntent();
         // if screen is landscape: show detail in container 2
         //if screen is portrait, replace list with detail in container1
@@ -227,8 +228,9 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
             if(mediaControlBinder.isPlaying()){
                 bar.setProgress(bookProgress.getProgress());
                 progress = selected.getDuration();
+                timestamp=bookProgress.getProgress();
             }
-            timestamp=((AudiobookService.BookProgress) msg.obj).getProgress();
+
             bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
 
                 @Override
@@ -269,11 +271,11 @@ public class MainActivity extends AppCompatActivity implements BookListFragment.
                 if(saved>=10){
                     startPpoint = saved-10;
                 }else{startPpoint=0;}
-
+                mediaControlBinder.setProgressHandler(playerHandler);
                 mediaControlBinder.play(f, startPpoint);
                 startService(intent);
                 duration = selected.getDuration();
-                mediaControlBinder.setProgressHandler(playerHandler);
+
             }else{
                 //else steam and download
                 Log.i("-----------------------------------------main play()", "start streaming");
